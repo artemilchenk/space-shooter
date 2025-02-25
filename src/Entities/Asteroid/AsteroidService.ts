@@ -4,23 +4,34 @@ import { Asteroid } from "./Asteriod";
 import AsteroidFactory from "./AsteroidFactory";
 import { Application, Renderer } from "pixi.js";
 import { Entity } from "../Entity";
+import { EntityManager } from "../../EntityManager";
+import { EntityTypes } from "../../Enums";
 
 export class AsteroidService {
-  private asteroids: Asteroid[] = [];
   private readonly asteroidFactory: AsteroidFactory;
+  private readonly entityManager: EntityManager;
 
   constructor(app: Application<Renderer>) {
+    this.entityManager = new EntityManager();
     this.asteroidFactory = new AsteroidFactory(app);
   }
 
   checkAsteroidPosition(newAsteroidEntity: Entity) {
-    return this.asteroids.some((asteroid) =>
-      Physics.isCheckAABB(asteroid, newAsteroidEntity),
+    return this.entityManager
+      .getEntities()
+      .some((asteroid) => Physics.isCheckAABB(asteroid, newAsteroidEntity));
+  }
+
+  asteroidsIsSet() {
+    return (
+      this.entityManager
+        .getEntities()
+        .filter((entity) => entity.type === EntityTypes.ASTEROID).length >= 8
     );
   }
 
   generateAsteroids() {
-    while (this.asteroids.length <= 7) {
+    while (!this.asteroidsIsSet()) {
       let asteroid: Asteroid | null = this.asteroidFactory.createAsteroid();
       asteroid.x = (Math.random() * (0.9 - 0.1) + 0.1) * CanvasDimensions.width;
       asteroid.y =
@@ -32,7 +43,7 @@ export class AsteroidService {
         continue;
       }
 
-      this.asteroids.push(asteroid);
+      this.entityManager.addEntity(asteroid);
     }
   }
 }

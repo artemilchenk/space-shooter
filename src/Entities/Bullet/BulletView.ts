@@ -5,7 +5,7 @@ export class BulletView extends Container {
     super();
 
     const bulletShape = new Graphics();
-    bulletShape.circle(0, 0, 5);
+    bulletShape.circle(0, 0, 10);
     bulletShape.fill({
       color: "darkblue",
     });

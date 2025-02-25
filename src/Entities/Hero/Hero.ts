@@ -1,10 +1,9 @@
 import { Entity } from "../Entity";
 import { Container } from "pixi.js";
-import { EntityTypes } from "../../Enums";
 import { HeroService } from "./HeroService";
+import { EntityTypes } from "../../Enums";
 
 export class Hero extends Entity {
-  private readonly type = EntityTypes.HERO;
   private velocityX = 0;
   private speed = 10;
   private readonly heroService: HeroService;
@@ -19,7 +18,7 @@ export class Hero extends Entity {
   };
 
   constructor(view: Container) {
-    super(view);
+    super(view, EntityTypes.HERO);
     this.heroService = new HeroService();
   }
 

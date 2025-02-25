@@ -1,4 +1,4 @@
-import { EBoardRegisteredKeys } from "./Enums";
+import { EBoardRegisteredKeys, EntityTypes } from "./Enums";
 
 export interface IBoardKey {
   isDown: boolean;
@@ -8,9 +8,10 @@ export interface IBoardKey {
 
 export type TKeyContext = Record<EBoardRegisteredKeys, IBoardKey>;
 
-export interface IEntityData {
+export interface IBulletContext {
+  type: EntityTypes.HERO | EntityTypes.BOSS;
   x: number;
   y: number;
-  width: number;
-  height: number;
 }
+
+export type TBulletType = EntityTypes.HERO | EntityTypes.BOSS;

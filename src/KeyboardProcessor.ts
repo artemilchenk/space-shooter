@@ -15,6 +15,11 @@ export class KeyboardProcessor {
       executeDown: () => {},
       executeUp: () => {},
     },
+    Space: {
+      isDown: false,
+      executeDown: () => {},
+      executeUp: () => {},
+    },
   };
 
   private readonly gameContext: Game;
