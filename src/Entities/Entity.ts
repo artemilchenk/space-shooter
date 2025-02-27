@@ -3,14 +3,12 @@ import { EntityTypes } from "../Enums";
 
 export class Entity {
   public readonly type: EntityTypes;
-  public readonly id: string;
   private view: Container;
 
   private isDead: boolean = false;
 
   constructor(view: Container, type: EntityTypes) {
     this.type = type;
-    this.id = `id-${Date.now()}`;
     this.view = view;
   }
 

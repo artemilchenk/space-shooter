@@ -10,3 +10,9 @@ export enum EntityTypes {
   BULLET = "bullet",
   BOSS = "boss",
 }
+
+export enum EGameState {
+  PLAYING = "playing",
+  WIN = "win",
+  LOSE = "lose",
+}

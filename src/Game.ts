@@ -1,41 +1,55 @@
 import { Application, Renderer } from "pixi.js";
 import { Hero } from "./Entities/Hero/Hero";
 import { KeyboardProcessor } from "./KeyboardProcessor";
-import { EBoardRegisteredKeys, EntityTypes } from "./Enums";
+import { EBoardRegisteredKeys, EGameState } from "./Enums";
 import { AsteroidService } from "./Entities/Asteroid/AsteroidService";
-import HeroFactory from "./Entities/Hero/HeroFactory";
-import BulletFactory from "./Entities/Bullet/BulletFactory";
 import { BulletService } from "./Entities/Bullet/BulletService";
 import { EntityManager } from "./EntityManager";
+import { Statistics } from "./Statistics";
+import { HeroService } from "./Entities/Hero/HeroService";
 
 export class Game {
-  public keyboardProcessor: KeyboardProcessor;
+  public state: EGameState;
+  public level: 1 | 2 = 1;
   private readonly app: Application<Renderer>;
-  private readonly hero: Hero;
-  private readonly bulletFactory: BulletFactory;
-  private readonly bulletService: BulletService;
+  private readonly statistics: Statistics;
+  public readonly keyboardProcessor: KeyboardProcessor;
   private readonly entityManager: EntityManager;
+  private readonly hero: Hero;
+  private readonly bulletService: BulletService;
+  private readonly asteroidService: AsteroidService;
+  private readonly heroService: HeroService;
 
   constructor(app: Application<Renderer>) {
-    this.entityManager = new EntityManager();
+    this.state = EGameState.PLAYING;
     this.app = app;
+
     this.keyboardProcessor = new KeyboardProcessor(this);
 
-    const asteroidService = new AsteroidService(app);
-    asteroidService.generateAsteroids();
+    this.entityManager = new EntityManager();
 
-    const heroFactory = new HeroFactory(app);
-    this.hero = heroFactory.createHero();
+    this.heroService = new HeroService(
+      app,
+      this.entityManager,
+      this.keyboardProcessor,
+    );
+    this.hero = this.heroService.createHero();
 
-    this.bulletFactory = new BulletFactory(app);
-    this.bulletService = new BulletService();
+    this.bulletService = new BulletService(app, this.entityManager);
+    this.asteroidService = new AsteroidService(app, this.entityManager);
+    this.asteroidService.generateAsteroids();
+
+    this.statistics = new Statistics(this, this.entityManager, this.hero);
 
     this.setKeys();
   }
 
   update() {
-    this.hero.update();
-    this.bulletService.updateBullet();
+    this.heroService.update();
+    this.bulletService.update();
+    this.asteroidService.update();
+    this.entityManager.clearDeadEntity();
+    this.statistics.update();
   }
 
   setKeys() {
@@ -43,10 +57,13 @@ export class Game {
       EBoardRegisteredKeys.LEFT,
     );
     arrowLeft.executeDown = () => {
+      if (this.state === EGameState.LOSE) return;
       this.hero.startLeftMove();
     };
 
     arrowLeft.executeUp = () => {
+      if (this.state === EGameState.LOSE) return;
+      this.hero.resetVelocity();
       this.hero.stopLeftMove();
     };
 
@@ -54,23 +71,21 @@ export class Game {
       EBoardRegisteredKeys.RIGHT,
     );
     arrowRight.executeDown = () => {
+      if (this.state === EGameState.LOSE) return;
       this.hero.startRightMove();
     };
 
     arrowRight.executeUp = () => {
+      if (this.state === EGameState.LOSE) return;
+      this.hero.resetVelocity();
       this.hero.stopRightMove();
     };
 
     const space = this.keyboardProcessor.getButton(EBoardRegisteredKeys.SPACE);
-    space.executeDown = () => {};
 
     space.executeUp = () => {
-      const bullet = this.bulletFactory.createBullet(
-        EntityTypes.HERO,
-        this.hero.x + this.hero.width / 2,
-        this.hero.y - this.hero.height / 10,
-      );
-      this.bulletService.addBullet(bullet);
+      if (this.state === EGameState.LOSE) return;
+      this.bulletService.createBullet(this.hero);
     };
   }
 }

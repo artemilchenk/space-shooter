@@ -1,13 +1,14 @@
-import { Entity } from "../Entity";
 import { Container } from "pixi.js";
-import { TBulletType } from "../../Types";
 import { EntityTypes } from "../../Enums";
+import { EmittedEntity } from "../EmittedEntity";
 
-export class Bullet extends Entity {
-  public readonly bulletType: TBulletType;
+export class Bullet extends EmittedEntity {
+  private speed = 20;
+  constructor(view: Container, ownerType: EntityTypes) {
+    super(view, EntityTypes.BULLET, ownerType);
+  }
 
-  constructor(view: Container, bulletType: TBulletType) {
-    super(view, EntityTypes.BULLET);
-    this.bulletType = bulletType;
+  move() {
+    this.y -= this.speed;
   }
 }

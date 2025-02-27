@@ -35,6 +35,7 @@ export class KeyboardProcessor {
   onKeyDown(key: KeyboardEvent) {
     if (isRegisteredKey(key.code)) {
       const button = this.keyState[key.code];
+      if (!button.isDown) button.isDown = true;
       button.executeDown.call(this.gameContext);
     }
   }
@@ -42,6 +43,7 @@ export class KeyboardProcessor {
   onKeyUp(key: KeyboardEvent) {
     if (isRegisteredKey(key.code)) {
       const button = this.keyState[key.code];
+      if (button.isDown) button.isDown = false;
       button.executeUp.call(this.gameContext);
     }
   }

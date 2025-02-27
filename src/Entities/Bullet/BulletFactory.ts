@@ -1,7 +1,7 @@
 import { Application, Renderer } from "pixi.js";
 import { BulletView } from "./BulletView";
 import { Bullet } from "./Bullet";
-import { TBulletType } from "../../Types";
+import { EntityTypes } from "../../Enums";
 
 export default class BulletFactory {
   private readonly app: Application<Renderer>;
@@ -9,11 +9,11 @@ export default class BulletFactory {
     this.app = app;
   }
 
-  createBullet(type: TBulletType, x: number, y: number): Bullet {
+  createBullet(x: number, y: number, ownerType: EntityTypes): Bullet {
     const bulletView = new BulletView();
     bulletView.x = x;
     bulletView.y = y;
     this.app.stage.addChild(bulletView);
-    return new Bullet(bulletView, type);
+    return new Bullet(bulletView, ownerType);
   }
 }

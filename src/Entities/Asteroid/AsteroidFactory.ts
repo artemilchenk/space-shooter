@@ -9,8 +9,8 @@ export default class AsteroidFactory {
   }
 
   createAsteroid() {
-    const heroView = new AsteroidView();
-    this.app.stage.addChild(heroView);
-    return new Asteroid(heroView);
+    const asteroidView = new AsteroidView();
+    this.app.stage.addChild(asteroidView);
+    return new Asteroid(asteroidView);
   }
 }

@@ -7,11 +7,3 @@ export interface IBoardKey {
 }
 
 export type TKeyContext = Record<EBoardRegisteredKeys, IBoardKey>;
-
-export interface IBulletContext {
-  type: EntityTypes.HERO | EntityTypes.BOSS;
-  x: number;
-  y: number;
-}
-
-export type TBulletType = EntityTypes.HERO | EntityTypes.BOSS;

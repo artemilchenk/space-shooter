@@ -6,14 +6,34 @@ import { Application, Renderer } from "pixi.js";
 import { Entity } from "../Entity";
 import { EntityManager } from "../../EntityManager";
 import { EntityTypes } from "../../Enums";
+import { Bullet } from "../Bullet/Bullet";
 
 export class AsteroidService {
   private readonly asteroidFactory: AsteroidFactory;
   private readonly entityManager: EntityManager;
 
-  constructor(app: Application<Renderer>) {
-    this.entityManager = new EntityManager();
+  constructor(app: Application<Renderer>, entityManager: EntityManager) {
+    this.entityManager = entityManager;
     this.asteroidFactory = new AsteroidFactory(app);
+  }
+
+  update() {
+    this.entityManager.getEntities().forEach((entity) => {
+      if (entity instanceof Asteroid) {
+        this.checkDamage(entity);
+      }
+    });
+  }
+
+  checkDamage(asteroid: Asteroid) {
+    for (let entity of this.entityManager.getEntities()) {
+      if (entity instanceof Bullet) {
+        if (Physics.checkCircleCollision(asteroid, entity)) {
+          asteroid.removeFromStage();
+          asteroid.dead();
+        }
+      }
+    }
   }
 
   checkAsteroidPosition(newAsteroidEntity: Entity) {
@@ -33,9 +53,10 @@ export class AsteroidService {
   generateAsteroids() {
     while (!this.asteroidsIsSet()) {
       let asteroid: Asteroid | null = this.asteroidFactory.createAsteroid();
-      asteroid.x = (Math.random() * (0.9 - 0.1) + 0.1) * CanvasDimensions.width;
+      asteroid.x =
+        (Math.random() * (0.95 - 0.05) + 0.05) * CanvasDimensions.width;
       asteroid.y =
-        (Math.random() * (0.5 - 0.1) + 0.1) * CanvasDimensions.height;
+        (Math.random() * (0.5 - 0.08) + 0.08) * CanvasDimensions.height;
 
       if (this.checkAsteroidPosition(asteroid)) {
         asteroid.removeFromStage();
