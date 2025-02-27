@@ -8,6 +8,7 @@ import { CanvasDimensions } from "../../Constants";
 import { EBoardRegisteredKeys } from "../../Enums";
 
 export class HeroService {
+  hero: Hero | undefined;
   heroFactory: HeroFactory;
   constructor(
     private readonly app: Application<Renderer>,
@@ -16,48 +17,44 @@ export class HeroService {
   ) {
     this.heroFactory = new HeroFactory(app);
   }
-  update() {}
+  update() {
+    if (this.hero) {
+      this.hero.x += Math.round(
+        this.hero.movement.x * (this.hero.speed + this.hero.velocityX),
+      );
+      this.checkHeroPosition(this.hero);
+      this.accelerateMovement(this.hero);
+    }
+  }
 
-  /* update() {
-     this.entityManager.getEntities().forEach((entity) => {
-       if (entity instanceof Hero) {
-         entity.x += Math.round(
-           entity.x * entity.speed + entity.velocityX * entity.movement.x,
-         );
+  accelerateMovement(entity: Hero) {
+    if (
+      this.keyboardProcessor.getButton(EBoardRegisteredKeys.RIGHT).isDown ||
+      this.keyboardProcessor.getButton(EBoardRegisteredKeys.LEFT).isDown
+    ) {
+      entity.count++;
 
-         this.accelerateMovement(entity);
-         this.checkHeroPosition(entity);
-       }
-     });
-   }
+      if (entity.count >= 30) entity.velocityX += 0.5;
+    }
+  }
 
-   accelerateMovement(entity: Hero) {
-     if (
-       this.keyboardProcessor.getButton(EBoardRegisteredKeys.RIGHT).isDown ||
-       this.keyboardProcessor.getButton(EBoardRegisteredKeys.LEFT).isDown
-     ) {
-       entity.count++;
+  checkHeroPosition(heroEntity: Hero) {
+    const canvasWidth = CanvasDimensions.width;
+    const entityWidth = heroEntity.width;
 
-       if (entity.count >= 30) entity.velocityX += 0.5;
-     }
-   }
+    if (heroEntity.x + entityWidth >= canvasWidth) {
+      heroEntity.x = canvasWidth - entityWidth;
+    }
 
-   checkHeroPosition(heroEntity: Hero) {
-     const canvasWidth = CanvasDimensions.width;
-     const entityWidth = heroEntity.width;
-
-     if (heroEntity.x + entityWidth >= canvasWidth) {
-       heroEntity.x = canvasWidth - entityWidth;
-     }
-
-     if (heroEntity.x <= 0) {
-       heroEntity.x = 0;
-     }
-   }*/
+    if (heroEntity.x <= 0) {
+      heroEntity.x = 0;
+    }
+  }
 
   createHero() {
-    const heroEntity = this.heroFactory.createHero(this.keyboardProcessor);
-    this.entityManager.addEntity(heroEntity);
-    return heroEntity;
+    this.hero = this.heroFactory.createHero(this.keyboardProcessor);
+
+    this.entityManager.addEntity(this.hero);
+    return this.hero;
   }
 }

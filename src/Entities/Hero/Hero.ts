@@ -26,37 +26,6 @@ export class Hero extends EmittiveEntity {
     this.keyboardProcessor = keyboardProcessor;
   }
 
-  update() {
-    this.x += Math.round(this.speed + this.velocityX * this.movement.x);
-
-    this.accelerateMovement(this);
-    this.checkHeroPosition(this);
-  }
-
-  accelerateMovement(entity: Hero) {
-    if (
-      this.keyboardProcessor.getButton(EBoardRegisteredKeys.RIGHT).isDown ||
-      this.keyboardProcessor.getButton(EBoardRegisteredKeys.LEFT).isDown
-    ) {
-      entity.count++;
-
-      if (entity.count >= 30) entity.velocityX += 0.5;
-    }
-  }
-
-  checkHeroPosition(heroEntity: Hero) {
-    const canvasWidth = CanvasDimensions.width;
-    const entityWidth = heroEntity.width;
-
-    if (heroEntity.x + entityWidth >= canvasWidth) {
-      heroEntity.x = canvasWidth - entityWidth;
-    }
-
-    if (heroEntity.x <= 0) {
-      heroEntity.x = 0;
-    }
-  }
-
   reset() {
     this.shots = 10;
   }

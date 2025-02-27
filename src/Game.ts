@@ -1,4 +1,4 @@
-import { Application, Renderer } from "pixi.js";
+import { Application, log2, Renderer } from "pixi.js";
 import { Hero } from "./Entities/Hero/Hero";
 import { KeyboardProcessor } from "./KeyboardProcessor";
 import { EBoardRegisteredKeys, EGameState } from "./Enums";
@@ -7,7 +7,8 @@ import { BulletService } from "./Entities/Bullet/BulletService";
 import { EntityManager } from "./EntityManager";
 import { Statistics } from "./Statistics";
 import { HeroService } from "./Entities/Hero/HeroService";
-import HeroFactory from "./Entities/Hero/HeroFactory";
+import { TimerUnit } from "./Timer/TimerUnit";
+import { TimerService } from "./Timer/TimerService";
 
 export class Game {
   public state: EGameState;
@@ -19,24 +20,25 @@ export class Game {
   private readonly hero: Hero;
   private readonly bulletService: BulletService;
   private readonly asteroidService: AsteroidService;
-  //private readonly heroService: HeroService;
+  private readonly heroService: HeroService;
+  private readonly timerService: TimerService;
 
   constructor(app: Application<Renderer>) {
     this.state = EGameState.PLAYING;
     this.app = app;
 
+    this.timerService = new TimerService();
+
     this.keyboardProcessor = new KeyboardProcessor(this);
 
     this.entityManager = new EntityManager();
 
-    /* this.heroService = new HeroService(
+    this.heroService = new HeroService(
       app,
       this.entityManager,
       this.keyboardProcessor,
-    );*/
-    const heroFactory = new HeroFactory(app);
-    this.hero = heroFactory.createHero(this.keyboardProcessor);
-    /* this.hero = this.heroService.createHero();*/
+    );
+    this.hero = this.heroService.createHero();
 
     this.bulletService = new BulletService(app, this.entityManager);
     this.asteroidService = new AsteroidService(app, this.entityManager);
@@ -48,11 +50,13 @@ export class Game {
   }
 
   update() {
-    this.hero.update();
+    this.heroService.update();
     this.bulletService.update();
     this.asteroidService.update();
     this.entityManager.clearDeadEntity();
     this.statistics.update();
+
+    this.timerService.update();
   }
 
   setKeys() {
