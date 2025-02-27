@@ -4,11 +4,10 @@ import { Hero } from "./Hero";
 import HeroFactory from "./HeroFactory";
 import { KeyboardProcessor } from "../../KeyboardProcessor";
 import { Application, Renderer } from "pixi.js";
-import { Entity } from "../Entity";
 import { CanvasDimensions } from "../../Constants";
 import { EBoardRegisteredKeys } from "../../Enums";
 
-export class HeroService implements EntityService {
+export class HeroService {
   heroFactory: HeroFactory;
   constructor(
     private readonly app: Application<Renderer>,
@@ -17,42 +16,44 @@ export class HeroService implements EntityService {
   ) {
     this.heroFactory = new HeroFactory(app);
   }
-  update() {
-    this.entityManager.getEntities().forEach((entity) => {
-      if (entity instanceof Hero) {
-        entity.x += Math.round(
-          entity.x * entity.speed + entity.velocityX * entity.movement.x,
-        );
+  update() {}
 
-        this.accelerateMovement(entity);
-        this.checkHeroPosition(entity);
-      }
-    });
-  }
+  /* update() {
+     this.entityManager.getEntities().forEach((entity) => {
+       if (entity instanceof Hero) {
+         entity.x += Math.round(
+           entity.x * entity.speed + entity.velocityX * entity.movement.x,
+         );
 
-  accelerateMovement(entity: Hero) {
-    if (
-      this.keyboardProcessor.getButton(EBoardRegisteredKeys.RIGHT).isDown ||
-      this.keyboardProcessor.getButton(EBoardRegisteredKeys.LEFT).isDown
-    ) {
-      entity.count++;
+         this.accelerateMovement(entity);
+         this.checkHeroPosition(entity);
+       }
+     });
+   }
 
-      if (entity.count >= 30) entity.velocityX += 0.5;
-    }
-  }
+   accelerateMovement(entity: Hero) {
+     if (
+       this.keyboardProcessor.getButton(EBoardRegisteredKeys.RIGHT).isDown ||
+       this.keyboardProcessor.getButton(EBoardRegisteredKeys.LEFT).isDown
+     ) {
+       entity.count++;
 
-  checkHeroPosition(heroEntity: Hero) {
-    const canvasWidth = CanvasDimensions.width;
-    const entityWidth = heroEntity.width;
+       if (entity.count >= 30) entity.velocityX += 0.5;
+     }
+   }
 
-    if (heroEntity.x + entityWidth >= canvasWidth) {
-      heroEntity.x = canvasWidth - entityWidth;
-    }
+   checkHeroPosition(heroEntity: Hero) {
+     const canvasWidth = CanvasDimensions.width;
+     const entityWidth = heroEntity.width;
 
-    if (heroEntity.x <= 0) {
-      heroEntity.x = 0;
-    }
-  }
+     if (heroEntity.x + entityWidth >= canvasWidth) {
+       heroEntity.x = canvasWidth - entityWidth;
+     }
+
+     if (heroEntity.x <= 0) {
+       heroEntity.x = 0;
+     }
+   }*/
 
   createHero() {
     const heroEntity = this.heroFactory.createHero(this.keyboardProcessor);

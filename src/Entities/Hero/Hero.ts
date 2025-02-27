@@ -1,7 +1,8 @@
 import { Container } from "pixi.js";
-import { EntityTypes } from "../../Enums";
+import { EBoardRegisteredKeys, EntityTypes } from "../../Enums";
 import { KeyboardProcessor } from "../../KeyboardProcessor";
 import { EmittiveEntity } from "../EmittiveEntity";
+import { CanvasDimensions } from "../../Constants";
 
 export class Hero extends EmittiveEntity {
   public readonly keyboardProcessor: KeyboardProcessor;
@@ -23,6 +24,37 @@ export class Hero extends EmittiveEntity {
   constructor(view: Container, keyboardProcessor: KeyboardProcessor) {
     super(view, EntityTypes.HERO, 1, 10, view.width / 2, view.height / 4);
     this.keyboardProcessor = keyboardProcessor;
+  }
+
+  update() {
+    this.x += Math.round(this.speed + this.velocityX * this.movement.x);
+
+    this.accelerateMovement(this);
+    this.checkHeroPosition(this);
+  }
+
+  accelerateMovement(entity: Hero) {
+    if (
+      this.keyboardProcessor.getButton(EBoardRegisteredKeys.RIGHT).isDown ||
+      this.keyboardProcessor.getButton(EBoardRegisteredKeys.LEFT).isDown
+    ) {
+      entity.count++;
+
+      if (entity.count >= 30) entity.velocityX += 0.5;
+    }
+  }
+
+  checkHeroPosition(heroEntity: Hero) {
+    const canvasWidth = CanvasDimensions.width;
+    const entityWidth = heroEntity.width;
+
+    if (heroEntity.x + entityWidth >= canvasWidth) {
+      heroEntity.x = canvasWidth - entityWidth;
+    }
+
+    if (heroEntity.x <= 0) {
+      heroEntity.x = 0;
+    }
   }
 
   reset() {

@@ -7,6 +7,7 @@ import { BulletService } from "./Entities/Bullet/BulletService";
 import { EntityManager } from "./EntityManager";
 import { Statistics } from "./Statistics";
 import { HeroService } from "./Entities/Hero/HeroService";
+import HeroFactory from "./Entities/Hero/HeroFactory";
 
 export class Game {
   public state: EGameState;
@@ -18,7 +19,7 @@ export class Game {
   private readonly hero: Hero;
   private readonly bulletService: BulletService;
   private readonly asteroidService: AsteroidService;
-  private readonly heroService: HeroService;
+  //private readonly heroService: HeroService;
 
   constructor(app: Application<Renderer>) {
     this.state = EGameState.PLAYING;
@@ -28,12 +29,14 @@ export class Game {
 
     this.entityManager = new EntityManager();
 
-    this.heroService = new HeroService(
+    /* this.heroService = new HeroService(
       app,
       this.entityManager,
       this.keyboardProcessor,
-    );
-    this.hero = this.heroService.createHero();
+    );*/
+    const heroFactory = new HeroFactory(app);
+    this.hero = heroFactory.createHero(this.keyboardProcessor);
+    /* this.hero = this.heroService.createHero();*/
 
     this.bulletService = new BulletService(app, this.entityManager);
     this.asteroidService = new AsteroidService(app, this.entityManager);
@@ -45,7 +48,7 @@ export class Game {
   }
 
   update() {
-    this.heroService.update();
+    this.hero.update();
     this.bulletService.update();
     this.asteroidService.update();
     this.entityManager.clearDeadEntity();
