@@ -22,7 +22,7 @@ export class BossService extends EmmitiveService {
     super();
 
     this.timerService.doEvery(() => {
-      //this.shot();
+      this.shot();
     }, BossData.shotFrequency);
   }
 
@@ -40,8 +40,12 @@ export class BossService extends EmmitiveService {
     if (!this.boss?.isActive) return;
 
     if (this.boss.health <= 0) {
-      this.boss.isActive = false;
-      this.boss.dead();
+      const boss = this.entityManager.getBoss();
+      if (boss) {
+        this.boss.dead();
+        boss.isActive = false;
+        boss.removeFromStage();
+      }
     }
 
     for (let entity of this.entityManager.getEntities()) {
@@ -51,8 +55,7 @@ export class BossService extends EmmitiveService {
           Physics.checkRectangleCircleCollision(this.boss, entity)
         ) {
           this.boss.health--;
-          entity.dead();
-          entity.removeFromStage();
+          this.entityManager.removeEntity(entity);
         }
       }
     }

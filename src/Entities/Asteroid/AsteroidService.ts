@@ -30,10 +30,8 @@ export class AsteroidService implements Service {
     for (let entity of this.entityManager.getEntities()) {
       if (entity instanceof Bullet) {
         if (Physics.checkCircleCollision(asteroid, entity)) {
-          entity.dead();
-          entity.removeFromStage();
-          asteroid.removeFromStage();
-          asteroid.dead();
+          this.entityManager.removeEntity(entity);
+          this.entityManager.removeEntity(asteroid);
         }
       }
     }

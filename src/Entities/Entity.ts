@@ -2,6 +2,7 @@ import { Container } from "pixi.js";
 import { EntityTypes } from "../Enums";
 
 export class Entity {
+  id: string;
   public isActive = true;
   public readonly type: EntityTypes;
   private view: Container;
@@ -11,6 +12,7 @@ export class Entity {
   constructor(view: Container, type: EntityTypes) {
     this.type = type;
     this.view = view;
+    this.id = Math.random().toString(36).substr(2, 9);
   }
 
   get x() {

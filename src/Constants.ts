@@ -22,6 +22,6 @@ export const BossDimensions = {
 };
 
 export const BossData = {
-  health: 5,
-  shotFrequency: 40,
+  health: 1,
+  shotFrequency: 60,
 };

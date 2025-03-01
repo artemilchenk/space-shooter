@@ -37,8 +37,7 @@ export class BulletService implements Service {
 
   checkPosition(bullet: Entity) {
     if (bullet.y <= 0 || bullet.y >= CanvasDimensions.height) {
-      bullet.removeFromStage();
-      bullet.dead();
+      this.entityManager.removeEntity(bullet);
     }
   }
 }

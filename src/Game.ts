@@ -1,4 +1,4 @@
-import { Application, Renderer } from "pixi.js";
+import { Application, Renderer, sayHello } from "pixi.js";
 import { Hero } from "./Entities/Hero/Hero";
 import { KeyboardProcessor } from "./KeyboardProcessor";
 import { EBoardRegisteredKeys, EGameState } from "./Enums";
@@ -69,18 +69,7 @@ export class Game {
     this.statistics.update();
     this.screenDashboard.update();
     this.timerService.update();
-
-    this.clearDeadEntity();
     this.watch();
-  }
-
-  clearDeadEntity() {
-    this.entityManager.getEntities().forEach((entity, index) => {
-      if (entity.isDead) {
-        entity.removeFromStage();
-        this.entityManager.getEntities().splice(index, 1);
-      }
-    });
   }
 
   lose(): void {
@@ -108,17 +97,15 @@ export class Game {
   goToNextLevel() {
     this.hero.isActive = false;
     this.level = 2;
-    this.state = EGameState.PENDING;
     this.screenDashboard.addLevelStageTextEntity("LEVEL 2");
     this.hero.reset();
 
     this.timerService.doAfter(() => {
       this.hero.isActive = true;
       this.screenDashboard.addBulletTextEntity(this.hero.shots);
-      this.state = EGameState.PLAYING;
       this.screenDashboard.removeLevelStageTextEntity();
       this.bossService.createBoss();
-    }, 180);
+    }, 120);
   }
 
   setKeys() {
