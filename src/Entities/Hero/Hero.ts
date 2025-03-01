@@ -1,20 +1,13 @@
 import { Container } from "pixi.js";
-import { EBoardRegisteredKeys, EntityTypes } from "../../Enums";
+import { EntityTypes } from "../../Enums";
 import { KeyboardProcessor } from "../../KeyboardProcessor";
 import { EmittiveEntity } from "../EmittiveEntity";
-import { CanvasDimensions } from "../../Constants";
 
 export class Hero extends EmittiveEntity {
   public readonly keyboardProcessor: KeyboardProcessor;
 
   public velocityX = 0;
-  public speed = 10;
-
   public count = 0;
-
-  public movement = {
-    x: 0,
-  };
 
   private directionRegister = {
     left: 0,
@@ -22,15 +15,18 @@ export class Hero extends EmittiveEntity {
   };
 
   constructor(view: Container, keyboardProcessor: KeyboardProcessor) {
-    super(view, EntityTypes.HERO, 1, 10, view.width / 2, view.height / 4);
+    super(view, EntityTypes.HERO, -1, 10, view.width / 2, -view.height / 4, 10);
     this.keyboardProcessor = keyboardProcessor;
   }
 
-  reset() {
+  public reset() {
     this.shots = 10;
+    this.velocityX = 0;
   }
 
-  startLeftMove() {
+  public startLeftMove() {
+    if (!this.isActive) return;
+
     this.directionRegister.left = -1;
 
     if (this.directionRegister.right > 0) {
@@ -41,7 +37,9 @@ export class Hero extends EmittiveEntity {
     this.movement.x = -1;
   }
 
-  startRightMove() {
+  public startRightMove() {
+    if (!this.isActive) return;
+
     this.directionRegister.right = 1;
 
     if (this.directionRegister.left < 0) {
@@ -52,19 +50,25 @@ export class Hero extends EmittiveEntity {
     this.movement.x = 1;
   }
 
-  stopLeftMove() {
+  public stopLeftMove() {
+    if (!this.isActive) return;
+
     this.directionRegister.left = 0;
     this.movement.x = this.directionRegister.right;
     this.count = 0;
   }
 
-  stopRightMove() {
+  public stopRightMove() {
+    if (!this.isActive) return;
+
     this.directionRegister.right = 0;
     this.movement.x = this.directionRegister.left;
     this.count = 0;
   }
 
-  resetVelocity(): void {
+  public resetVelocity(): void {
+    if (!this.isActive) return;
+
     this.velocityX = 0;
   }
 }

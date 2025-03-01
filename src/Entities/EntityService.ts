@@ -1,3 +1,5 @@
-export abstract class EntityService {
+import { Service } from "../Service";
+
+export abstract class EntityService extends Service {
   update() {}
 }

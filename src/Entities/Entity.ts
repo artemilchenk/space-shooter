@@ -2,10 +2,11 @@ import { Container } from "pixi.js";
 import { EntityTypes } from "../Enums";
 
 export class Entity {
+  public isActive = true;
   public readonly type: EntityTypes;
   private view: Container;
 
-  private isDead: boolean = false;
+  public isDead: boolean = false;
 
   constructor(view: Container, type: EntityTypes) {
     this.type = type;
@@ -32,10 +33,6 @@ export class Entity {
 
   get height() {
     return this.view.height;
-  }
-
-  get isDeadState() {
-    return this.isDead;
   }
 
   dead() {

@@ -9,11 +9,17 @@ export default class BulletFactory {
     this.app = app;
   }
 
-  createBullet(x: number, y: number, ownerType: EntityTypes): Bullet {
-    const bulletView = new BulletView();
+  createBullet(
+    x: number,
+    y: number,
+    ownerType: EntityTypes,
+    vectorY: 1 | -1,
+    color?: string | undefined,
+  ): Bullet {
+    const bulletView = new BulletView(color);
     bulletView.x = x;
     bulletView.y = y;
     this.app.stage.addChild(bulletView);
-    return new Bullet(bulletView, ownerType);
+    return new Bullet(bulletView, ownerType, vectorY);
   }
 }

@@ -3,7 +3,10 @@ import { Container } from "pixi.js";
 import { EntityTypes } from "../Enums";
 
 export class EmittiveEntity extends Entity {
-  emittedType = EntityTypes.BULLET;
+  public readonly emittedType = EntityTypes.BULLET;
+  public movement = {
+    x: 0,
+  };
   constructor(
     view: Container,
     type: EntityTypes,
@@ -11,6 +14,7 @@ export class EmittiveEntity extends Entity {
     public shots: number,
     public readonly emitiveShiftX: number,
     public readonly emitiveShiftY: number,
+    public readonly speed: number,
   ) {
     super(view, type);
   }

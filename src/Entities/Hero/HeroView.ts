@@ -10,9 +10,6 @@ export class HeroView extends Container {
     heroShape.fill({
       color: "darkgreen",
     });
-    heroShape.stroke({
-      color: "darkgreen",
-    });
 
     this.addChild(heroShape);
   }

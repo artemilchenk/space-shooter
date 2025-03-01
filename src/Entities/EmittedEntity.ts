@@ -7,6 +7,7 @@ export class EmittedEntity extends Entity {
     view: Container,
     type: EntityTypes,
     public readonly ownerType: EntityTypes,
+    public readonly vectorY: 1 | -1,
   ) {
     super(view, type);
     this.ownerType = ownerType;

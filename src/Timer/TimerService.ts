@@ -1,11 +1,21 @@
-import { TimerUnit } from "./TimerUnit";
+import { DoAfter } from "./DoAfter";
+import { DoEvery } from "./DoEvery";
+import { Timer } from "./Timer";
 
-export class TimerService {
-  timers: TimerUnit[] = [];
-  constructor() {}
+export class TimerService extends Timer {
+  timers: Timer[] = [];
+  constructor() {
+    super();
+  }
 
   doAfter(callback: () => void, frameCount: number) {
-    const timer = new TimerUnit();
+    const timer = new DoAfter();
+    timer.setTimer(callback, frameCount);
+    this.timers.push(timer);
+  }
+
+  doEvery(callback: () => void, frameCount: number) {
+    const timer = new DoEvery();
     timer.setTimer(callback, frameCount);
     this.timers.push(timer);
   }

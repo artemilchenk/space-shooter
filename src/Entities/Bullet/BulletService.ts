@@ -1,30 +1,27 @@
 import { CanvasDimensions } from "../../Constants";
 import { EntityManager } from "../../EntityManager";
-import { Physics } from "../../Physics";
 import { Entity } from "../Entity";
 import { Bullet } from "./Bullet";
-import { Asteroid } from "../Asteroid/Asteriod";
 import BulletFactory from "./BulletFactory";
 import { EmittiveEntity } from "../EmittiveEntity";
 import { Application, Renderer } from "pixi.js";
+import { Service } from "../../Service";
 
-export class BulletService {
-  bulletFactory: BulletFactory;
+export class BulletService implements Service {
   constructor(
     private readonly app: Application<Renderer>,
     private readonly entityManager: EntityManager,
-  ) {
-    this.entityManager = entityManager;
-    this.bulletFactory = new BulletFactory(app);
-  }
+    private readonly bulletFactory: BulletFactory = new BulletFactory(app),
+  ) {}
 
-  createBullet(ownerEntity: EmittiveEntity) {
+  createBullet(ownerEntity: EmittiveEntity, color?: string | undefined) {
     const bullet = this.bulletFactory.createBullet(
       ownerEntity.x + ownerEntity.emitiveShiftX,
-      ownerEntity.y - ownerEntity.emitiveShiftY * ownerEntity.emitiveVectorY,
+      ownerEntity.y + ownerEntity.emitiveShiftY,
       ownerEntity.type,
+      ownerEntity.emitiveVectorY,
+      color,
     );
-
     this.entityManager.addEntity(bullet);
     ownerEntity.shot();
   }
@@ -34,20 +31,8 @@ export class BulletService {
       if (entity instanceof Bullet) {
         entity.move();
         this.checkPosition(entity);
-        this.checkDamage(entity);
       }
     });
-  }
-
-  checkDamage(bullet: Bullet) {
-    for (let entity of this.entityManager.getEntities()) {
-      if (entity instanceof Asteroid) {
-        if (Physics.checkCircleCollision(bullet, entity)) {
-          bullet.removeFromStage();
-          bullet.dead();
-        }
-      }
-    }
   }
 
   checkPosition(bullet: Entity) {

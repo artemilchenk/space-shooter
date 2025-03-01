@@ -7,8 +7,9 @@ import { Entity } from "../Entity";
 import { EntityManager } from "../../EntityManager";
 import { EntityTypes } from "../../Enums";
 import { Bullet } from "../Bullet/Bullet";
+import { Service } from "../../Service";
 
-export class AsteroidService {
+export class AsteroidService implements Service {
   private readonly asteroidFactory: AsteroidFactory;
   private readonly entityManager: EntityManager;
 
@@ -29,6 +30,8 @@ export class AsteroidService {
     for (let entity of this.entityManager.getEntities()) {
       if (entity instanceof Bullet) {
         if (Physics.checkCircleCollision(asteroid, entity)) {
+          entity.dead();
+          entity.removeFromStage();
           asteroid.removeFromStage();
           asteroid.dead();
         }

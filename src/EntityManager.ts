@@ -1,4 +1,6 @@
 import { Entity } from "./Entities/Entity";
+import { EntityTypes } from "./Enums";
+import { Boss } from "./Entities/Boss/Boss";
 
 export class EntityManager {
   private entities: Entity[] = [];
@@ -12,12 +14,7 @@ export class EntityManager {
     this.entities.push(entity);
   }
 
-  clearDeadEntity() {
-    this.entities.map((entity) => {
-      if (entity.isDeadState) {
-        const index = this.entities.indexOf(entity);
-        this.entities.splice(index, 1);
-      }
-    });
+  getBoss() {
+    return this.entities.find((e) => e instanceof Boss);
   }
 }

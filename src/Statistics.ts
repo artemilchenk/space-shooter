@@ -2,11 +2,14 @@ import { EntityManager } from "./EntityManager";
 import { Asteroid } from "./Entities/Asteroid/Asteriod";
 import { Hero } from "./Entities/Hero/Hero";
 import { Game } from "./Game";
-import { EGameState } from "./Enums";
+import { Service } from "./Service";
+import { Bullet } from "./Entities/Bullet/Bullet";
+import { EGameState, EntityTypes } from "./Enums";
+import { Boss } from "./Entities/Boss/Boss";
 
-export class Statistics {
+export class Statistics implements Service {
   public isAsteroids = true;
-  public iHeroBullets = true;
+  public isHeroBullets = true;
   constructor(
     private readonly game: Game,
     private readonly entityManager: EntityManager,
@@ -27,7 +30,11 @@ export class Statistics {
   }
 
   checkHeroBullets() {
-    this.iHeroBullets = this.hero.shots > 0;
+    this.isHeroBullets =
+      this.hero.shots > 0 ||
+      !!this.entityManager
+        .getEntities()
+        .find((e) => e instanceof Bullet && e.ownerType === EntityTypes.HERO);
   }
 
   check() {
@@ -36,18 +43,29 @@ export class Statistics {
   }
 
   calculate() {
-    if (
-      (this.isAsteroids && !this.iHeroBullets) ||
-      (!this.isAsteroids && !this.iHeroBullets)
-    ) {
-      this.game.state = EGameState.LOSE;
+    if (this.hero.isDead) {
+      console.log("1");
+      this.game.lose();
     }
 
-    if (!this.isAsteroids && this.iHeroBullets) {
-      if (this.game.level !== 2) {
-        this.game.level = 2;
-        this.hero.reset();
+    if (this.game.level === 1) {
+      if (this.isAsteroids && !this.isHeroBullets) {
+        console.log("2");
+        this.game.lose();
       }
+
+      if (!this.isAsteroids && this.isHeroBullets) {
+        this.game.goToNextLevel();
+      }
+    }
+
+    if (this.game.level === 2) {
+      if (!this.isHeroBullets && this.entityManager.getBoss()) {
+        console.log("3");
+        this.game.lose();
+      }
+
+      if (this.entityManager.getBoss()?.isDead) this.game.win();
     }
 
     this.check();
