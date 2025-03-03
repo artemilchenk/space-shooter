@@ -1,57 +1,115 @@
 import { Application, Renderer, Text, TextStyle } from "pixi.js";
 import { ETextEntity, ETextNames } from "./Enums";
 import { Service } from "./Service";
-
-type TextEntity = {
-  id: string;
-  type: ETextEntity;
-  name: ETextNames;
-  textView: Text;
-  text: string;
-  isDone: boolean;
-};
+import { CanvasDimensions } from "./Constants";
+import { TextEntity } from "./Types";
 
 export class ScreenDashboard implements Service {
   textEntities: TextEntity[] = [];
   constructor(private readonly app: Application<Renderer>) {}
 
-  private addTextEntity(entity: TextEntity): void {
-    this.textEntities.push(entity);
+  update() {
+    this.clearDoneText();
   }
 
-  addBulletTextEntity(shots: number) {
-    const text = `Bullets: ${shots}`;
+  private addBoardTextEntity(
+    textEntity: Text,
+    text: string,
+    name: ETextNames,
+  ): void {
+    this.textEntities.push({
+      id: Date.now().toString(),
+      textView: textEntity,
+      type: ETextEntity.BOARD,
+      name: name,
+      text: text,
+      isDone: false,
+    });
+  }
 
+  private addStageTextEntity(
+    textEntity: Text,
+    text: string,
+    name: ETextNames,
+  ): void {
+    this.textEntities.push({
+      id: Date.now().toString(),
+      textView: textEntity,
+      type: ETextEntity.STAGE,
+      name: name,
+      text: text,
+      isDone: false,
+    });
+  }
+
+  removeOldBoardText(name: ETextNames) {
     this.textEntities.forEach((entity) => {
-      if (entity.type === ETextEntity.BOARD) {
+      if (entity.type === ETextEntity.BOARD && entity.name === name) {
         entity.isDone = true;
       }
     });
+  }
 
-    const boardTextStyle = new TextStyle({
+  addBosHealthText(text: string): void {
+    this.removeOldBoardText(ETextNames.BOSS_HEALTH_COUNT);
+
+    const textStyle = new TextStyle({
       fill: "white",
       fontSize: 32,
       fontFamily: "Arial",
     });
 
-    const boardText = new Text({
+    const bossText = new Text({
       text: text,
-      style: boardTextStyle,
+      style: textStyle,
     });
 
-    boardText.x = 20;
-    boardText.y = this.app.canvas.height - boardText.height;
+    this.app.stage.addChild(bossText);
 
-    this.app.stage.addChild(boardText);
+    this.addBoardTextEntity(bossText, text, ETextNames.BOSS_HEALTH_COUNT);
+  }
 
-    this.addTextEntity({
-      id: Date.now().toString(),
-      textView: boardText,
-      type: ETextEntity.BOARD,
-      name: ETextNames.BULLET_COUNT,
-      text: text,
-      isDone: false,
+  addBulletCountText(text: string) {
+    this.removeOldBoardText(ETextNames.BULLET_COUNT);
+
+    const textStyle = new TextStyle({
+      fill: "white",
+      fontSize: 32,
+      fontFamily: "Arial",
     });
+
+    const bulletText = new Text({
+      text: text,
+      style: textStyle,
+    });
+
+    bulletText.y = CanvasDimensions.height - bulletText.height;
+
+    this.app.stage.addChild(bulletText);
+
+    this.addBoardTextEntity(bulletText, text, ETextNames.BULLET_COUNT);
+  }
+
+  addLevelBoardText(text: string) {
+    this.removeOldBoardText(ETextNames.LEVEL_COUNT);
+
+    const textStyle = new TextStyle({
+      fill: "white",
+      fontSize: 32,
+      fontFamily: "Arial",
+    });
+
+    const levelText = new Text({
+      text: text,
+      style: textStyle,
+    });
+
+    levelText.x = CanvasDimensions.width - levelText.width;
+    levelText.y = CanvasDimensions.height - levelText.height;
+
+    this.app.stage.addChild(levelText);
+
+    this.addBoardTextEntity(levelText, text, ETextNames.LEVEL_COUNT);
   }
 
   addLevelStageTextEntity(text: string): void {
@@ -71,19 +129,12 @@ export class ScreenDashboard implements Service {
 
     this.app.stage.addChild(stageText);
 
-    this.addTextEntity({
-      id: Date.now().toString(),
-      textView: stageText,
-      type: ETextEntity.STAGED,
-      name: ETextNames.LEVEL_COUNT,
-      text: text,
-      isDone: false,
-    });
+    this.addStageTextEntity(stageText, text, ETextNames.LEVEL_COUNT);
   }
 
   removeLevelStageTextEntity(): void {
     this.textEntities.forEach((entity) => {
-      if (entity.type === ETextEntity.STAGED) {
+      if (entity.type === ETextEntity.STAGE) {
         entity.isDone = true;
       }
     });
@@ -96,9 +147,5 @@ export class ScreenDashboard implements Service {
         this.textEntities.splice(index, 1);
       }
     });
-  }
-
-  update() {
-    this.clearDoneText();
   }
 }

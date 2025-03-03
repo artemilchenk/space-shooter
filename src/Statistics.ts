@@ -4,7 +4,7 @@ import { Hero } from "./Entities/Hero/Hero";
 import { Game } from "./Game";
 import { Service } from "./Service";
 import { Bullet } from "./Entities/Bullet/Bullet";
-import { EGameState, EntityTypes } from "./Enums";
+import { EntityTypes } from "./Enums";
 
 export class Statistics implements Service {
   public isAsteroids = true;

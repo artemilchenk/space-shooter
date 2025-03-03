@@ -1,5 +1,5 @@
 export const CanvasDimensions = {
-  width: 1024,
+  width: 1280,
   height: 720,
 };
 
@@ -21,7 +21,12 @@ export const BossDimensions = {
   height: 150,
 };
 
+export const HeroData = {
+  shots: 10,
+  level: 1,
+};
+
 export const BossData = {
-  health: 1,
+  health: 4,
   shotFrequency: 60,
 };

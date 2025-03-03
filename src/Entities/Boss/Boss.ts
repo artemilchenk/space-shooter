@@ -19,12 +19,10 @@ export class Boss extends EmittiveEntity {
   }
 
   damage() {
-    this.health -= this.health;
+    this.health--;
   }
 
   move() {
-    if (!this.isActive) return;
-
     if (!Physics.checkEntityStickToScreenBoundaries(this)) {
       this.movement.x = -this.movement.x;
     }

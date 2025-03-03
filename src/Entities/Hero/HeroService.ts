@@ -8,6 +8,7 @@ import { Physics } from "../../Physics";
 import { BulletService } from "../Bullet/BulletService";
 import { EmmitiveService } from "../EmmitiveService";
 import { Bullet } from "../Bullet/Bullet";
+import { ScreenDashboard } from "../../ScreenDashboard";
 
 export class HeroService extends EmmitiveService {
   hero: Hero | undefined;
@@ -16,6 +17,7 @@ export class HeroService extends EmmitiveService {
     private readonly entityManager: EntityManager,
     private readonly keyboardProcessor: KeyboardProcessor,
     private readonly bulletService: BulletService,
+    private readonly screenDashboard: ScreenDashboard,
     private readonly heroFactory: HeroFactory = new HeroFactory(app),
   ) {
     super();
@@ -40,11 +42,12 @@ export class HeroService extends EmmitiveService {
           this.hero &&
           Physics.checkRectangleCircleCollision(this.hero, entity)
         ) {
-          entity.dead();
           entity.removeFromStage();
-          this.hero.isActive = false;
+          this.entityManager.removeEntityById(entity.id);
+
           this.hero.dead();
           this.hero.removeFromStage();
+          this.entityManager.removeEntityById(entity.id);
         }
       }
     }
@@ -62,6 +65,8 @@ export class HeroService extends EmmitiveService {
 
     if (this.hero && this.hero.shots > 0) {
       this.bulletService.createBullet(this.hero, "darkblue");
+      this.hero.shot();
+      this.screenDashboard.addBulletCountText(`Bullets: ${this.hero.shots}`);
     }
   }
 

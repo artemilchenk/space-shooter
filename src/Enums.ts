@@ -11,7 +11,7 @@ export enum EntityTypes {
   BOSS = "boss",
 }
 
-export enum EGameState {
+export enum EPlayState {
   PLAYING = "playing",
   WIN = "win",
   LOSE = "lose",
@@ -20,10 +20,11 @@ export enum EGameState {
 
 export enum ETextEntity {
   BOARD = "board",
-  STAGED = "staged",
+  STAGE = "stage",
 }
 
 export enum ETextNames {
   BULLET_COUNT = "bulletCount",
   LEVEL_COUNT = "levelCount",
+  BOSS_HEALTH_COUNT = "bossHealthCount",
 }

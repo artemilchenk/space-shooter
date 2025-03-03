@@ -1,7 +1,7 @@
-import { Application, Renderer, sayHello } from "pixi.js";
+import { Application, Renderer } from "pixi.js";
 import { Hero } from "./Entities/Hero/Hero";
 import { KeyboardProcessor } from "./KeyboardProcessor";
-import { EBoardRegisteredKeys, EGameState } from "./Enums";
+import { EBoardRegisteredKeys, EPlayState, ETextNames } from "./Enums";
 import { AsteroidService } from "./Entities/Asteroid/AsteroidService";
 import { BulletService } from "./Entities/Bullet/BulletService";
 import { EntityManager } from "./EntityManager";
@@ -11,9 +11,16 @@ import { TimerService } from "./Timer/TimerService";
 import { ScreenDashboard } from "./ScreenDashboard";
 import { BossService } from "./Entities/Boss/BossService";
 import { Boss } from "./Entities/Boss/Boss";
+import { BossData, HeroData } from "./Constants";
 
 export class Game {
-  public state: EGameState;
+  private _playState: {
+    prev: EPlayState;
+    current: EPlayState;
+  } = {
+    prev: EPlayState.PLAYING,
+    current: EPlayState.PLAYING,
+  };
   public level: 1 | 2 = 1;
   private readonly hero: Hero;
   private boss: Boss | undefined;
@@ -29,7 +36,7 @@ export class Game {
   private readonly screenDashboard: ScreenDashboard;
 
   constructor(app: Application<Renderer>) {
-    this.state = EGameState.PLAYING;
+    this.playState = EPlayState.PLAYING;
     this.app = app;
 
     this.timerService = new TimerService();
@@ -37,28 +44,45 @@ export class Game {
     this.entityManager = new EntityManager();
 
     this.bulletService = new BulletService(app, this.entityManager);
+
+    this.screenDashboard = new ScreenDashboard(app);
+    this.screenDashboard.addBulletCountText(`Bullets: ${HeroData.shots}`);
+    this.screenDashboard.addLevelBoardText(`Level ${HeroData.level}`);
     this.heroService = new HeroService(
       app,
       this.entityManager,
       this.keyboardProcessor,
       this.bulletService,
+      this.screenDashboard,
     );
     this.bossService = new BossService(
       app,
       this.entityManager,
       this.bulletService,
       this.timerService,
+      this.screenDashboard,
     );
     this.asteroidService = new AsteroidService(app, this.entityManager);
 
     this.hero = this.heroService.createHero();
     this.asteroidService.generateAsteroids();
 
-    this.screenDashboard = new ScreenDashboard(app);
     this.statistics = new Statistics(this, this.entityManager, this.hero);
-    this.screenDashboard.addBulletTextEntity(this.hero.shots);
 
     this.setKeys();
+  }
+
+  set playState(value: EPlayState) {
+    this._playState.prev = this._playState.current;
+    this._playState.current = value;
+  }
+
+  get playPrevState() {
+    return this._playState.prev;
+  }
+
+  get playCurrentState() {
+    return this._playState.current;
   }
 
   update() {
@@ -69,22 +93,34 @@ export class Game {
     this.statistics.update();
     this.screenDashboard.update();
     this.timerService.update();
-    this.watch();
+
+    this.watchPlayingState();
   }
 
   lose(): void {
-    this.state = EGameState.LOSE;
-    this.screenDashboard.addLevelStageTextEntity("YOU LOSE");
+    this.playState = EPlayState.LOSE;
   }
 
   win(): void {
-    this.state = EGameState.WIN;
-    this.screenDashboard.addLevelStageTextEntity("YOU WIN");
+    this.playState = EPlayState.WIN;
   }
 
-  watch() {
-    if (this.state === EGameState.WIN || this.state === EGameState.LOSE) {
+  watchPlayingState() {
+    if (this.entityManager.getBullets().length <= 0) {
+      if (
+        this.playCurrentState === EPlayState.LOSE ||
+        (this.playCurrentState === EPlayState.WIN &&
+          this.playPrevState === EPlayState.LOSE)
+      ) {
+        this.screenDashboard.addLevelStageTextEntity("YOU LOSE");
+      } else if (this.playCurrentState === EPlayState.WIN)
+        this.screenDashboard.addLevelStageTextEntity("YOU WIN");
+    }
+
+    if (this.playCurrentState !== EPlayState.PLAYING) {
       this.freezeEntity();
+    } else {
+      this.unFreezeEntity();
     }
   }
 
@@ -94,17 +130,25 @@ export class Game {
     });
   }
 
+  unFreezeEntity() {
+    this.entityManager.getEntities().forEach((entity, index) => {
+      entity.isActive = true;
+    });
+  }
+
   goToNextLevel() {
-    this.hero.isActive = false;
+    this.playState = EPlayState.PENDING;
     this.level = 2;
     this.screenDashboard.addLevelStageTextEntity("LEVEL 2");
+    this.screenDashboard.addLevelBoardText("LEVEL 2");
     this.hero.reset();
 
     this.timerService.doAfter(() => {
-      this.hero.isActive = true;
-      this.screenDashboard.addBulletTextEntity(this.hero.shots);
+      this.playState = EPlayState.PLAYING;
+      this.screenDashboard.addBulletCountText(`Bullets: ${this.hero.shots}`);
       this.screenDashboard.removeLevelStageTextEntity();
       this.bossService.createBoss();
+      this.screenDashboard.addBosHealthText(`Health ${BossData.health}`);
     }, 120);
   }
 
@@ -137,7 +181,6 @@ export class Game {
 
     space.executeUp = () => {
       this.heroService.shot();
-      this.screenDashboard.addBulletTextEntity(this.hero.shots);
     };
   }
 }

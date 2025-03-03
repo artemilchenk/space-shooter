@@ -23,7 +23,6 @@ export class BulletService implements Service {
       color,
     );
     this.entityManager.addEntity(bullet);
-    ownerEntity.shot();
   }
 
   update() {
@@ -37,7 +36,8 @@ export class BulletService implements Service {
 
   checkPosition(bullet: Entity) {
     if (bullet.y <= 0 || bullet.y >= CanvasDimensions.height) {
-      this.entityManager.removeEntity(bullet);
+      bullet.removeFromStage();
+      this.entityManager.removeEntityById(bullet.id);
     }
   }
 }

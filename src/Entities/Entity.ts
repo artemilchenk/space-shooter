@@ -38,6 +38,7 @@ export class Entity {
   }
 
   dead() {
+    this.isActive = false;
     this.isDead = true;
   }
 

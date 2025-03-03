@@ -1,5 +1,6 @@
 import { Entity } from "./Entities/Entity";
 import { Boss } from "./Entities/Boss/Boss";
+import { Bullet } from "./Entities/Bullet/Bullet";
 
 export class EntityManager {
   private entities: Entity[] = [];
@@ -13,20 +14,15 @@ export class EntityManager {
     this.entities.push(entity);
   }
 
-  removeEntity(entityToRemove: Entity) {
-    const index = this.entities.findIndex(
-      (entity) => entity.id === entityToRemove.id,
-    );
-
-    if (!index) return;
-
-    entityToRemove.removeFromStage();
-    entityToRemove.dead();
-    entityToRemove.isActive = false;
-    this.entities.splice(index, 1);
+  removeEntityById(id: string) {
+    this.entities = this.entities.filter((entity) => entity.id !== id);
   }
 
   getBoss() {
     return this.entities.find((e) => e instanceof Boss);
+  }
+
+  getBullets() {
+    return this.entities.filter((entity) => entity instanceof Bullet);
   }
 }

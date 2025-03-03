@@ -9,6 +9,7 @@ import { BossData } from "../../Constants";
 import { Bullet } from "../Bullet/Bullet";
 import { EntityTypes } from "../../Enums";
 import { Physics } from "../../Physics";
+import { ScreenDashboard } from "../../ScreenDashboard";
 
 export class BossService extends EmmitiveService {
   boss: Boss | undefined;
@@ -17,6 +18,7 @@ export class BossService extends EmmitiveService {
     private readonly entityManager: EntityManager,
     private readonly bulletService: BulletService,
     private readonly timerService: TimerService,
+    private readonly screenDashboard: ScreenDashboard,
     private readonly bossFactory: BossFactory = new BossFactory(app),
   ) {
     super();
@@ -27,25 +29,21 @@ export class BossService extends EmmitiveService {
   }
 
   public update() {
-    if (!this.boss?.isActive) {
+    if (!this.boss) {
       this.getBoss();
     } else {
-      this.boss.move();
+      if (this.boss.isActive) this.boss.move();
     }
 
     this.checkDamage();
   }
 
   checkDamage() {
-    if (!this.boss?.isActive) return;
+    if (!this.boss) return;
 
     if (this.boss.health <= 0) {
-      const boss = this.entityManager.getBoss();
-      if (boss) {
-        this.boss.dead();
-        boss.isActive = false;
-        boss.removeFromStage();
-      }
+      this.boss.dead();
+      this.boss.removeFromStage();
     }
 
     for (let entity of this.entityManager.getEntities()) {
@@ -54,8 +52,12 @@ export class BossService extends EmmitiveService {
           this.boss &&
           Physics.checkRectangleCircleCollision(this.boss, entity)
         ) {
-          this.boss.health--;
-          this.entityManager.removeEntity(entity);
+          if (this.boss.health > 0) this.boss.damage();
+
+          this.screenDashboard.addBosHealthText(`Health ${this.boss.health}`);
+
+          entity.removeFromStage();
+          this.entityManager.removeEntityById(entity.id);
         }
       }
     }

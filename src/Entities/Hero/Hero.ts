@@ -2,6 +2,7 @@ import { Container } from "pixi.js";
 import { EntityTypes } from "../../Enums";
 import { KeyboardProcessor } from "../../KeyboardProcessor";
 import { EmittiveEntity } from "../EmittiveEntity";
+import { HeroData } from "../../Constants";
 
 export class Hero extends EmittiveEntity {
   public readonly keyboardProcessor: KeyboardProcessor;
@@ -15,13 +16,22 @@ export class Hero extends EmittiveEntity {
   };
 
   constructor(view: Container, keyboardProcessor: KeyboardProcessor) {
-    super(view, EntityTypes.HERO, -1, 10, view.width / 2, -view.height / 4, 10);
+    super(
+      view,
+      EntityTypes.HERO,
+      -1,
+      HeroData.shots,
+      view.width / 2,
+      -view.height / 4,
+      10,
+    );
     this.keyboardProcessor = keyboardProcessor;
   }
 
   public reset() {
     this.shots = 10;
     this.velocityX = 0;
+    this.movement.x = 0;
   }
 
   public startLeftMove() {
