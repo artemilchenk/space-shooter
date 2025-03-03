@@ -28,5 +28,5 @@ export const HeroData = {
 
 export const BossData = {
   health: 4,
-  shotFrequency: 60,
+  shotFrequency: 30,
 };

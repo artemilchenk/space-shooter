@@ -39,7 +39,7 @@ export class HeroService extends EmmitiveService {
     for (let entity of this.entityManager.getEntities()) {
       if (entity instanceof Bullet && entity.ownerType === EntityTypes.BOSS) {
         if (
-          this.hero &&
+          this.hero?.isActive &&
           Physics.checkRectangleCircleCollision(this.hero, entity)
         ) {
           entity.removeFromStage();

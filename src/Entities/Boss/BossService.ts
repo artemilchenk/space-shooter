@@ -49,13 +49,11 @@ export class BossService extends EmmitiveService {
     for (let entity of this.entityManager.getEntities()) {
       if (entity instanceof Bullet && entity.ownerType === EntityTypes.HERO) {
         if (
-          this.boss &&
+          this.boss.health > 0 &&
           Physics.checkRectangleCircleCollision(this.boss, entity)
         ) {
-          if (this.boss.health > 0) this.boss.damage();
-
+          this.boss.damage();
           this.screenDashboard.addBosHealthText(`Health ${this.boss.health}`);
-
           entity.removeFromStage();
           this.entityManager.removeEntityById(entity.id);
         }
